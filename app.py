@@ -6,6 +6,9 @@ import boto3
 import json
 from dotenv import load_dotenv
 
+from src.clickhouse import get_database_structure, run_query
+from src.prompts import make_prompt, format_qeury_result
+
 load_dotenv()
 
 TELEGRAM_API_KEY = os.environ.get("TELEGRAM_API_KEY")
@@ -89,19 +92,32 @@ def handle_message(body):
     user_msg = body["user_msg"]
     chat_dest = body["chat_dest"]
 
+    database_structure = get_database_structure()
+    bot.send_message(chat_dest, f"Database structure:\n{database_structure}")
+
+    prompt = make_prompt(database_structure, user_msg)
+
     openai.api_key = os.environ.get("OPENAI_API_KEY")
     response = openai.Completion.create(
         model="text-davinci-003",
-        prompt=user_msg,
+        prompt=prompt,
         temperature=0.7,
         max_tokens=1751,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0,
     )
-    text = response.choices[0].text
-    bot.send_message(chat_dest, text)
+    query_text = response.choices[0].text
+    bot.send_message(chat_dest, f"Query text:\n{query_text}")
 
+    try:
+        query_result = run_query(query_text)
+        query_result_text = format_qeury_result(query_result)
+        print("Query result:", query_result)
+        bot.send_message(chat_dest, query_result_text)
+    except Exception as exc:
+        bot.send_message(chat_dest, "Error running query")
+ 
     return "OK"
 
 
