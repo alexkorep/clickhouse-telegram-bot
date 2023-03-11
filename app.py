@@ -25,6 +25,12 @@ bot = telebot.TeleBot(TELEGRAM_API_KEY)
 app = Flask(__name__)
 sqs = boto3.resource("sqs")
 
+bot.set_my_commands(
+    [
+        telebot.types.BotCommand("/structure", "Show database structure"),
+    ]
+)
+
 
 @app.route("/", methods=["GET", "HEAD"])
 def index():
@@ -87,14 +93,34 @@ def process_messages(event, context):
     handle_message(body)
 
 
+def handle_command(user_msg, chat_dest):
+    if user_msg == "/structure":
+        # TODO create a separate function for this
+        try:
+            database_structure = get_database_structure()
+            bot.send_message(chat_dest, database_structure)
+        except Exception as exc:
+            bot.send_message(chat_dest, "Cannot connect to ClickHouse database.")
+            print("Error getting database structure:", exc)
+    elif user_msg == "/start":
+        bot.send_message(
+            chat_dest,
+            "Hello! I am a ClickHouse SQL AI generator bot. Please send me a question and I'll extract the data from the database for you.",
+        )
+    else:
+        bot.send_message(chat_dest, "Unknown command.")
+
+
 def handle_message(body):
-    print("Handling message", body)
     user_msg = body["user_msg"]
     chat_dest = body["chat_dest"]
 
+    if user_msg[0] == "/":
+        handle_command(user_msg, chat_dest)
+        return "OK"
+
     try:
         database_structure = get_database_structure()
-        bot.send_message(chat_dest, f"Database structure:\n{database_structure}")
     except Exception as exc:
         bot.send_message(chat_dest, "Cannot connect to ClickHouse database.")
         print("Error getting database structure:", exc)
@@ -118,10 +144,10 @@ def handle_message(body):
     try:
         query_result = run_query(query_text)
         query_result_text = format_qeury_result(query_result)
-        print("Query result:", query_result)
         bot.send_message(chat_dest, query_result_text)
     except Exception as exc:
-        bot.send_message(chat_dest, "Error running query")
+        bot.send_message(chat_dest, f"Error running query: {exc}")
+        print("Error running query:", exc)
         return "OK"
 
     return "OK"
