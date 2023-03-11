@@ -5,6 +5,7 @@ def make_prompt(database_structure, user_msg):
 The database name is {CLICKHOUSE_DATABASE}
 Using ClickHouse database SQL dialect, 
 return an SQL statement that answers to this question: {user_msg}
+Prefix table names with the database name, e.g. {CLICKHOUSE_DATABASE}.table_name
 """
 
 
