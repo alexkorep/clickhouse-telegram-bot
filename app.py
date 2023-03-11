@@ -7,7 +7,7 @@ import json
 from dotenv import load_dotenv
 
 from src.clickhouse import get_database_structure, run_query
-from src.prompts import make_prompt, format_qeury_result
+from src.prompts import make_prompt, format_qeury_result, make_prompt_with_query_results
 
 load_dotenv()
 
@@ -92,8 +92,13 @@ def handle_message(body):
     user_msg = body["user_msg"]
     chat_dest = body["chat_dest"]
 
-    database_structure = get_database_structure()
-    bot.send_message(chat_dest, f"Database structure:\n{database_structure}")
+    try:
+        database_structure = get_database_structure()
+        bot.send_message(chat_dest, f"Database structure:\n{database_structure}")
+    except Exception as exc:
+        bot.send_message(chat_dest, "Cannot connect to ClickHouse database.")
+        print("Error getting database structure:", exc)
+        return "OK"
 
     prompt = make_prompt(database_structure, user_msg)
 
@@ -117,7 +122,8 @@ def handle_message(body):
         bot.send_message(chat_dest, query_result_text)
     except Exception as exc:
         bot.send_message(chat_dest, "Error running query")
- 
+        return "OK"
+
     return "OK"
 
 
