@@ -7,6 +7,7 @@ Using ClickHouse database SQL dialect,
 return an SQL statement that answers to this question: {user_msg}
 Prefix table names with the database name, e.g. {CLICKHOUSE_DATABASE}.table_name.
 If question doesn't say how many records to display, limit the result with 10 rows.
+Field aliaces should be a single word.
 """
 
 
