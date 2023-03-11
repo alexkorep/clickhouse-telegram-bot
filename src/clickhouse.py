@@ -6,6 +6,7 @@ CLICKHOUSE_PORT = os.environ.get("CLICKHOUSE_PORT", "")
 CLICKHOUSE_DATABASE = os.environ.get("CLICKHOUSE_DATABASE", "default")
 CLICKHOUSE_USER = os.environ.get("CLICKHOUSE_USER", "default")
 CLICKHOUSE_PASSWORD = os.environ.get("CLICKHOUSE_PASSWORD", "")
+CLICKHOUSE_SECURE = os.environ.get("CLICKHOUSE_SECURE", "False").lower() == "true"
 
 client = Client(
     host=CLICKHOUSE_HOST,
@@ -13,6 +14,7 @@ client = Client(
     user=CLICKHOUSE_USER,
     password=CLICKHOUSE_PASSWORD,
     database=CLICKHOUSE_DATABASE,
+    secure=CLICKHOUSE_SECURE,
 )
 
 
