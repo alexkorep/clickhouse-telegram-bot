@@ -41,8 +41,17 @@ flask run --host=0.0.0.0 --port 5001
 # Roadmap
 
 [✅] Getting database structure
+
 [✅] Generating prompt based on user question and then database structure
+
 [✅] Sending the prompt to gpt3
+
 [✅] Sending generated SQL to the clickhouse server
+
 [ ] Sending the SQL results to the gpt3 together with the user prompt
+
 [ ] Sending gpt3 response to the user
+
+# Demo video
+
+https://youtu.be/Qeh1RQ1dU2g
