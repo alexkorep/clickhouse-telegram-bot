@@ -7,7 +7,7 @@ import json
 from dotenv import load_dotenv
 
 from src.clickhouse import get_database_structure, run_query
-from src.prompts import make_prompt, format_qeury_result, make_prompt_with_query_results
+from src.prompts import make_prompt, format_qeury_result
 
 load_dotenv()
 
