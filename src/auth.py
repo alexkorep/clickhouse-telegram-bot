@@ -25,7 +25,7 @@ admin_client = clickhouse_connect.get_client(
 
 
 def check_invite(user_msg):
-    result = admin_client.command(
+    result = admin_client.query(
         "SELECT * FROM invites WHERE invite = %(invite)s",
         {"invite": user_msg},
     )
