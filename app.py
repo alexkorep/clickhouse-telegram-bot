@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 
 from src.clickhouse import get_database_structure, run_query
 from src.prompts import make_prompt, format_qeury_result
+from src.auth import check_authentication
+from src.messages import MSG_WELCOME
 
 load_dotenv()
 
@@ -48,15 +50,13 @@ def telegram_webhook():
     chat_dest = message.chat.id
     user_msg = message.text
     user_username = message.from_user.username
-    if not is_allowed_username(user_username):
-        bot.send_message(chat_dest, "Sorry, you are not allowed to use this bot.")
-        return "", 200
 
     bot.send_chat_action(chat_id=chat_dest, action="typing", timeout=10)
 
     body = {
         "chat_dest": chat_dest,
         "user_msg": user_msg,
+        "user_username": user_username,
     }
     if USE_SQS:
         send_message_to_queue(body, SQS_QUEUE_NAME)
@@ -64,11 +64,6 @@ def telegram_webhook():
         handle_message(body)
 
     return "", 200
-
-
-def is_allowed_username(username):
-    username_list = os.environ.get("ALLOWED_USERNAMES", "").split(",")
-    return username in username_list
 
 
 def send_message_to_queue(msg, queue_name):
@@ -105,7 +100,7 @@ def handle_command(user_msg, chat_dest):
     elif user_msg == "/start":
         bot.send_message(
             chat_dest,
-            "Hello! I am a ClickHouse SQL AI generator bot. Please send me a question and I'll extract the data from the database for you.",
+            MSG_WELCOME,
         )
     else:
         bot.send_message(chat_dest, "Unknown command.")
@@ -114,6 +109,10 @@ def handle_command(user_msg, chat_dest):
 def handle_message(body):
     user_msg = body["user_msg"]
     chat_dest = body["chat_dest"]
+    user_username = body["user_username"]
+
+    if not check_authentication(user_username, bot, chat_dest, user_msg):
+        return "OK"
 
     if user_msg[0] == "/":
         handle_command(user_msg, chat_dest)
