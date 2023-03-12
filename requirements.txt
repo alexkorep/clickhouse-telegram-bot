@@ -2,6 +2,6 @@ Flask==2.2.2
 pyTelegramBotAPI==4.9.0
 openai==0.27.2
 zappa==0.56.1
-boto3==1.26.72
-python-dotenv==1.0.0
-clickhouse-driver==0.2.5
+boto3
+python-dotenv
+clickhouse-connect==0.5.15
