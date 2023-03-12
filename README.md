@@ -1,6 +1,6 @@
-# sql-ai-bot
+# clickhouse-telegram-bot
 
-Telegram Bot to generate SQL queries based on OpenAI GPT3
+A Telegram bot to get data from ClickHouse using plain English questions (based on GPT3)
 
 ## Configuration
 
@@ -44,13 +44,13 @@ flask run --host=0.0.0.0 --port 5001
 
 [✅] Generating prompt based on user question and then database structure
 
-[✅] Sending the prompt to gpt3
+[✅] Sending the prompt to GPT3
 
 [✅] Sending generated SQL to the clickhouse server
 
-[ ] Sending the SQL results to the gpt3 together with the user prompt
+[ ] Use ChatGPT API instead of GPT3 API
 
-[ ] Sending gpt3 response to the user
+[ ] Store chat history in a persistent storage in order to have a conversation
 
 # Demo video
 
